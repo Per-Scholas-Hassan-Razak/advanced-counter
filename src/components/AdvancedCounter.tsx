@@ -13,11 +13,13 @@ import { useEffect, useState } from "react";
 
 const AdvancedCounter: React.FC = () => {
   const theme = useTheme();
-  const COUNT_HISTORY_KEY = 'countHistory'
+  const COUNT_HISTORY_KEY = "countHistory";
+  const COUNT_KEY = "count";
 
   const [count, setCount] = useState<number | null>(null);
   const [countHistory, setCountHistory] = useState<number[]>([] as number[]);
   const [stepValue, setStepValue] = useState(1);
+  const [message, setMessage] = useState("");
 
   const handleIncrement = () => {
     setCount((prevCount) => (prevCount !== null ? prevCount + stepValue : 0));
@@ -35,8 +37,13 @@ const AdvancedCounter: React.FC = () => {
 
   useEffect(() => {
     const savedHistory = localStorage.getItem(COUNT_HISTORY_KEY);
+    const savedCount = localStorage.getItem(COUNT_KEY);
+
     if (savedHistory) {
       setCountHistory(JSON.parse(savedHistory));
+    }
+    if (savedCount) {
+      setCount(JSON.parse(savedCount));
     }
   }, []);
 
@@ -47,7 +54,12 @@ const AdvancedCounter: React.FC = () => {
   }, [count]);
 
   useEffect(() => {
+    localStorage.setItem(COUNT_KEY, JSON.stringify(count));
+  }, [count]);
+
+  useEffect(() => {
     localStorage.setItem(COUNT_HISTORY_KEY, JSON.stringify(countHistory));
+    setMessage("Count History Saved");
   }, [countHistory]);
 
   const handleStepValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,9 +114,7 @@ const AdvancedCounter: React.FC = () => {
           width: "120px",
         }}
       />
-      <Typography variant="h6">Display Message: N/A</Typography>
-
-      <Typography variant="h6">Count History</Typography>
+      <Typography variant="h6">{message}</Typography>
 
       <Box
         sx={{
@@ -116,12 +126,13 @@ const AdvancedCounter: React.FC = () => {
           backgroundColor: theme.palette.background.paper,
         }}
       >
-        {countHistory.length === 0 ? (
+        <Typography variant="h6">Count History</Typography>
+        {countHistory.length === 0  ? (
           <Typography variant="body2" color="text.secondary">
             No History Yet
           </Typography>
         ) : (
-          <List dense>
+          <List>
             {countHistory.map((prevCount, index) => (
               <ListItem key={index} disablePadding>
                 <ListItemText primary={prevCount}></ListItemText>
