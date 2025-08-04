@@ -21,6 +21,7 @@ const AdvancedCounter: React.FC = () => {
   const [stepValue, setStepValue] = useState(1);
   const [message, setMessage] = useState("");
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   const handleIncrement = () => {
     setCount((prevCount) => (prevCount !== null ? prevCount + stepValue : 0));
@@ -31,6 +32,7 @@ const AdvancedCounter: React.FC = () => {
   };
 
   const handleReset = () => {
+    setIsResetting(true);
     setCount(0);
     setCountHistory([]);
     setStepValue(1);
@@ -63,8 +65,12 @@ const AdvancedCounter: React.FC = () => {
   }, [count]);
 
   useEffect(() => {
-    localStorage.setItem(COUNT_HISTORY_KEY, JSON.stringify(countHistory));
-    setMessage("Count History Saved");
+    if(!isResetting){
+        localStorage.setItem(COUNT_HISTORY_KEY, JSON.stringify(countHistory));
+        setMessage("Count History Saved");
+    }else{
+        setIsResetting(false)
+    }
   }, [countHistory]);
 
   useEffect(() => {
