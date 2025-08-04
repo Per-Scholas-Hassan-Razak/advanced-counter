@@ -62,6 +62,22 @@ const AdvancedCounter: React.FC = () => {
     setMessage("Count History Saved");
   }, [countHistory]);
 
+  useEffect(() => {
+    const handleKeyDown = (e:KeyboardEvent) => {
+        if(e.key === "ArrowUp"){
+            setCount((prevCount) => (prevCount !== null ? prevCount + stepValue : 0));
+        }else if(e.key === 'ArrowDown'){
+            setCount((prevCount) => (prevCount !== null ? prevCount - stepValue : 0));
+        }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+        window.removeEventListener('keydown',handleKeyDown)
+    }
+  },[stepValue])
+
   const handleStepValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setStepValue(Number(e.target.value));
   };
