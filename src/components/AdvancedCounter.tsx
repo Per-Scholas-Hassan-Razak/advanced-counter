@@ -16,10 +16,11 @@ const AdvancedCounter: React.FC = () => {
   const COUNT_HISTORY_KEY = "countHistory";
   const COUNT_KEY = "count";
 
-  const [count, setCount] = useState<number | null>(null);
+  const [count, setCount] = useState<number>(0);
   const [countHistory, setCountHistory] = useState<number[]>([] as number[]);
   const [stepValue, setStepValue] = useState(1);
   const [message, setMessage] = useState("");
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   const handleIncrement = () => {
     setCount((prevCount) => (prevCount !== null ? prevCount + stepValue : 0));
@@ -30,9 +31,11 @@ const AdvancedCounter: React.FC = () => {
   };
 
   const handleReset = () => {
-    setCount(null);
+    setCount(0);
     setCountHistory([]);
     setStepValue(1);
+    localStorage.removeItem(COUNT_KEY);
+    localStorage.removeItem(COUNT_HISTORY_KEY);
   };
 
   useEffect(() => {
@@ -48,8 +51,10 @@ const AdvancedCounter: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (count !== null) {
+    if (hasInitialized) {
       setCountHistory((prevCountArray) => [count, ...prevCountArray]);
+    }else{
+        setHasInitialized(true)
     }
   }, [count]);
 
@@ -63,20 +68,24 @@ const AdvancedCounter: React.FC = () => {
   }, [countHistory]);
 
   useEffect(() => {
-    const handleKeyDown = (e:KeyboardEvent) => {
-        if(e.key === "ArrowUp"){
-            setCount((prevCount) => (prevCount !== null ? prevCount + stepValue : 0));
-        }else if(e.key === 'ArrowDown'){
-            setCount((prevCount) => (prevCount !== null ? prevCount - stepValue : 0));
-        }
-    }
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowUp") {
+        setCount((prevCount) =>
+          prevCount !== null ? prevCount + stepValue : 0
+        );
+      } else if (e.key === "ArrowDown") {
+        setCount((prevCount) =>
+          prevCount !== null ? prevCount - stepValue : 0
+        );
+      }
+    };
 
-    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-        window.removeEventListener('keydown',handleKeyDown)
-    }
-  },[stepValue])
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [stepValue]);
 
   const handleStepValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setStepValue(Number(e.target.value));
@@ -123,7 +132,7 @@ const AdvancedCounter: React.FC = () => {
       <TextField
         label="Set Step Value"
         type="number"
-        inputProps={{ min: 0, max: 100 }}
+        inputProps={{ min: 1, max: 100 }}
         value={stepValue}
         onChange={handleStepValueChange}
         sx={{
@@ -143,7 +152,7 @@ const AdvancedCounter: React.FC = () => {
         }}
       >
         <Typography variant="h6">Count History</Typography>
-        {countHistory.length === 0  ? (
+        {countHistory.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
             No History Yet
           </Typography>
