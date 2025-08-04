@@ -1,4 +1,5 @@
 import {
+    Alert,
   Box,
   Button,
   List,
@@ -36,6 +37,7 @@ const AdvancedCounter: React.FC = () => {
     setCount(0);
     setCountHistory([]);
     setStepValue(1);
+    setMessage('History Cleared')
     localStorage.removeItem(COUNT_KEY);
     localStorage.removeItem(COUNT_HISTORY_KEY);
   };
@@ -55,8 +57,8 @@ const AdvancedCounter: React.FC = () => {
   useEffect(() => {
     if (hasInitialized) {
       setCountHistory((prevCountArray) => [count, ...prevCountArray]);
-    }else{
-        setHasInitialized(true)
+    } else {
+      setHasInitialized(true);
     }
   }, [count]);
 
@@ -65,11 +67,11 @@ const AdvancedCounter: React.FC = () => {
   }, [count]);
 
   useEffect(() => {
-    if(!isResetting){
-        localStorage.setItem(COUNT_HISTORY_KEY, JSON.stringify(countHistory));
-        setMessage("Count History Saved");
-    }else{
-        setIsResetting(false)
+    if (!isResetting) {
+      localStorage.setItem(COUNT_HISTORY_KEY, JSON.stringify(countHistory));
+      setMessage("Count History Saved");
+    } else {
+      setIsResetting(false);
     }
   }, [countHistory]);
 
@@ -113,8 +115,12 @@ const AdvancedCounter: React.FC = () => {
         height: "700px",
       }}
     >
-      <Typography variant="h6">Advanced Counter</Typography>
-      <Typography variant="h4">Current Count: {count}</Typography>
+      <Typography variant="h4" fontWeight="bold">
+        Advanced Counter
+      </Typography>
+      <Typography variant="h5" color="primary" sx={{ mb: 2 }}>
+        Current Count: {count}
+      </Typography>
 
       <Box
         sx={{
@@ -122,30 +128,37 @@ const AdvancedCounter: React.FC = () => {
           width: "100%",
           justifyContent: "center",
           gap: 2,
+          flexWrap: "wrap",
         }}
       >
-        <Button variant="contained" onClick={handleDecrement}>
-          Decrement
+        <Button variant="contained" color="primary" onClick={handleDecrement}>
+          - Decrement
         </Button>
-        <Button variant="contained" onClick={handleIncrement}>
-          Increment
+        <Button variant="contained" color="primary" onClick={handleIncrement}>
+          + Increment
         </Button>
         <Button variant="outlined" color="secondary" onClick={handleReset}>
-          Reset
+          Reset All
         </Button>
       </Box>
-
-      <TextField
-        label="Set Step Value"
-        type="number"
-        inputProps={{ min: 1, max: 100 }}
-        value={stepValue}
-        onChange={handleStepValueChange}
-        sx={{
-          width: "120px",
-        }}
-      />
-      <Typography variant="h6">{message}</Typography>
+      <Box display="flex" alignItems="center" gap={2}>
+        <Typography variant="body1">Step Value:</Typography>
+        <TextField
+          label="Set Step Value"
+          type="number"
+          inputProps={{ min: 1, max: 100 }}
+          value={stepValue}
+          onChange={handleStepValueChange}
+          sx={{
+            width: "120px",
+          }}
+        />
+      </Box>
+      {message && (
+        <Alert severity="success" variant="outlined" sx={{ mt: 1 }}>
+          {message}
+        </Alert>
+      )}
 
       <Box
         sx={{
